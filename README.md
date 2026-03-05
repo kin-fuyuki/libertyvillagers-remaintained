@@ -1,4 +1,4 @@
-# Liberty's Villagers
+# Liberty's Villagers - remaintained
 
 Are you the mayor of a village? Are you tired of your villagers failing to find their beds at nightfall, or forgetting
 their workstations in the morning? Have you seen one too many villager die from jumping off stairs and injuring
