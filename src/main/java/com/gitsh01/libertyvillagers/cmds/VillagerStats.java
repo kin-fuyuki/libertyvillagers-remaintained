@@ -11,12 +11,10 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
-import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.passive.CatVariant;
-import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.ServerCommandSource;
@@ -146,10 +144,10 @@ public class VillagerStats {
         int unemployed = 0;
         int homeless = 0;
         for (VillagerEntity villager : villagers) {
-            if (villager.getVillagerData().getProfession() == VillagerProfession.NITWIT) {
+            if (villager.getVillagerData().profession() == VillagerProfession.NITWIT) {
                 nitwits++;
             }
-            if (villager.getVillagerData().getProfession() == VillagerProfession.NONE) {
+            if (villager.getVillagerData().profession() == VillagerProfession.NONE) {
                 unemployed++;
             }
             if (villager.isBaby()) {
@@ -219,11 +217,11 @@ public class VillagerStats {
         for (VillagerEntity villager : villagers) {
             if (villager.isBaby()) {
                 String babyText = Text.translatable("text.LibertyVillagers.villagerStats.baby").getString();
-                villagerProfessionMap.merge(babyText, new ProfessionInfo(villager.getVillagerData().getProfession(), 1),
+                villagerProfessionMap.merge(babyText, new ProfessionInfo(villager.getVillagerData().profession().value(), 1),
                         ProfessionInfo::mergeProfessionInfo);
             } else {
-                villagerProfessionMap.merge(translatedProfession(villager.getVillagerData().getProfession()),
-                        new ProfessionInfo(villager.getVillagerData().getProfession(), 1),
+                villagerProfessionMap.merge(translatedProfession(villager.getVillagerData().profession().value()),
+                        new ProfessionInfo(villager.getVillagerData().profession().value(), 1),
                         ProfessionInfo::mergeProfessionInfo);
             }
         }
@@ -369,15 +367,21 @@ public class VillagerStats {
                 .getString() + "\n\n";
 
         TreeMap<String, Integer> catVariantMap = new TreeMap<>();
-
-        for (Map.Entry<RegistryKey<CatVariant>, CatVariant> catVariantEntry : Registries.CAT_VARIANT.getEntrySet()) {
-            catVariantMap.put(translatedCatVariant(catVariantEntry.getKey().getValue().toShortTranslationKey()), 0);
-        }
-
+        catVariantMap.put(translatedCatVariant(CatVariants.TABBY.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.BLACK.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.RED.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.SIAMESE.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.BRITISH_SHORTHAIR.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.CALICO.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.PERSIAN.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.RAGDOLL.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.WHITE.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.JELLIE.getValue().toShortTranslationKey()), 0);
+        catVariantMap.put(translatedCatVariant(CatVariants.ALL_BLACK.getValue().toShortTranslationKey()), 0);
         if (cats.size() > 0) {
             for (CatEntity cat : cats) {
-                String variant =
-                        translatedCatVariant(Registries.CAT_VARIANT.getId(cat.getVariant().value()).toShortTranslationKey());
+
+                String variant = translatedCatVariant(cat.getVariant().getIdAsString());
                 catVariantMap.merge(variant, 1, Integer::sum);
             }
 

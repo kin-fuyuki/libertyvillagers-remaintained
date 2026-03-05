@@ -31,7 +31,7 @@ public abstract class VillagerBreedTaskMixin {
     private void goHome(ServerWorld world, VillagerEntity first, VillagerEntity second, CallbackInfo ci) {
         if (CONFIG.villagersGeneralConfig.villagerBabiesRequireWorkstationAndBed) {
             Optional<BlockPos> optionalWorkstation = world.getPointOfInterestStorage()
-                    .getPosition(VillagerProfession.NONE.acquirableWorkstation(),
+                    .getPosition(VillagerProfession.IS_ACQUIRABLE_JOB_SITE,
                             (poiType, pos) -> this.canReachHome(first, pos, poiType), first.getBlockPos(),
                             CONFIG.villagerPathfindingConfig.findPOIRange);
             if (optionalWorkstation.isEmpty()) {

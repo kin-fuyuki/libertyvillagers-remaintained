@@ -1,13 +1,12 @@
 package com.gitsh01.libertyvillagers.cmds;
 
+import com.gitsh01.libertyvillagers.acessors.getFreeTicketsAccessor;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.block.BeehiveBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ComparatorBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ComparatorBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
@@ -25,6 +24,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
@@ -38,6 +38,7 @@ import java.util.Optional;
 
 import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.world.RedstoneView.DIRECTIONS;
 
 
 public class VillagerInfo {
@@ -79,7 +80,7 @@ public class VillagerInfo {
         HitResult hitResult2;
         // Look for an entity between us and the block.
         if ((hitResult2 = ProjectileUtil.getEntityCollision(serverWorld, player, vec3d2, vec3d3,
-                player.getBoundingBox().stretch(player.getVelocity()).expand(maxDistance), Entity::isAlive)) != null) {
+                player.getBoundingBox().stretch(player.getVelocity()).expand(maxDistance), Entity::isAlive,0.05f)) != null) {
             hit = hitResult2;
         }
 
@@ -127,7 +128,7 @@ public class VillagerInfo {
 
         VillagerEntity villager = (VillagerEntity)entity;
         String occupation =
-                VillagerStats.translatedProfession(villager.getVillagerData().getProfession());
+                VillagerStats.translatedProfession(villager.getVillagerData().profession().value());
         lines.add(Text.translatable("text.LibertyVillagers.villagerInfo.occupation", occupation));
 
         // Client-side villagers don't have memories.
@@ -207,9 +208,14 @@ public class VillagerInfo {
                 int numBees = beehiveBlockEntity.getBeeCount();
                 lines.add(Text.translatable("text.LibertyVillagers.villagerInfo.numBees", numBees));
             }
-
-            int numHoney = blockState.getComparatorOutput(serverWorld, blockPos);
-            lines.add(Text.translatable("text.LibertyVillagers.villagerInfo.numHoney", numHoney));
+            Direction dir;
+            for (Direction direction : DIRECTIONS) {
+                if (serverWorld.getBlockEntity(blockPos.add(direction.getVector())) instanceof ComparatorBlockEntity){
+                    dir=direction;
+                    int numHoney = blockState.getComparatorOutput(serverWorld, blockPos,dir);
+                    lines.add(Text.translatable("text.LibertyVillagers.villagerInfo.numHoney", numHoney));
+                };
+            }
         }
 
         Optional<RegistryEntry<PointOfInterestType>> optionalRegistryEntry =
@@ -239,7 +245,7 @@ public class VillagerInfo {
         }
 
         @SuppressWarnings("deprecation")
-        int freeTickets = storage.getFreeTickets(blockPos);
+        int freeTickets = ((getFreeTicketsAccessor)(Object)storage).libertyvillagers$getFreeTickets(blockPos);
         Text isOccupied =
                 freeTickets < poiType.ticketCount() ? Text.translatable("text.LibertyVillagers.villagerInfo.true") :
                         Text.translatable("text" + ".LibertyVillagers.villagerInfo.false");

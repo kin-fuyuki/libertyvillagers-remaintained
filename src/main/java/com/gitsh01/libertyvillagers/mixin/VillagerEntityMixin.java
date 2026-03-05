@@ -12,10 +12,10 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.village.VillagerData;
@@ -54,37 +54,24 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
     @Shadow
     public static Map<Item, Integer> ITEM_FOOD_VALUES;
 
-    @Shadow
-    private static Set<Item> GATHERABLE_ITEMS;
+    //@Shadow
+    //private static Set<Item> GATHERABLE_ITEMS;
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     static private void modifyStaticBlock(CallbackInfo ci) {
         // Only specific professions should have seeds and wheat.
-        GATHERABLE_ITEMS =  ImmutableSet.copyOf(Sets.difference(GATHERABLE_ITEMS,
-                ImmutableSet.of(Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.WHEAT)));
         if (CONFIG.villagersGeneralConfig.villagersEatMelons) {
-            GATHERABLE_ITEMS = new HashSet<>(GATHERABLE_ITEMS);
-            GATHERABLE_ITEMS.add(Items.MELON_SLICE);
             ITEM_FOOD_VALUES = new HashMap<>(ITEM_FOOD_VALUES);
             ITEM_FOOD_VALUES.put(Items.MELON_SLICE, 1);
-        }
-        if (CONFIG.villagersProfessionConfig.farmersHarvestMelons) {
-            GATHERABLE_ITEMS = new HashSet<>(GATHERABLE_ITEMS);
-            GATHERABLE_ITEMS.add(Items.MELON_SLICE);
         }
         if (CONFIG.villagersGeneralConfig.villagersEatPumpkinPie) {
             ITEM_FOOD_VALUES = new HashMap<>(ITEM_FOOD_VALUES);
             ITEM_FOOD_VALUES.put(Items.PUMPKIN_PIE, 1);
-            GATHERABLE_ITEMS = new HashSet<>(GATHERABLE_ITEMS);
-            GATHERABLE_ITEMS.add(Items.PUMPKIN_PIE);
         }
         if (CONFIG.villagersGeneralConfig.villagersEatCookedFish) {
             ITEM_FOOD_VALUES = new HashMap<>(ITEM_FOOD_VALUES);
             ITEM_FOOD_VALUES.put(Items.COOKED_COD, 1);
             ITEM_FOOD_VALUES.put(Items.COOKED_SALMON, 1);
-            GATHERABLE_ITEMS = new HashSet<>(GATHERABLE_ITEMS);
-            GATHERABLE_ITEMS.add(Items.COOKED_COD);
-            GATHERABLE_ITEMS.add(Items.COOKED_SALMON);
         }
     }
 
@@ -110,22 +97,35 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
         if (CONFIG.villagersGeneralConfig.allBabyVillagers) {
             this.setBaby(true);
         }
+
+        // If initialized with a rod, get rid of it.
+        if (this.getMainHandStack().isOf(Items.FISHING_ROD)) {
+            this.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+        }
+        // Get rid of items the villager can't gather.
+        Set<Item> GATHERABLE_ITEMS = GatherItemsVillagerTaskAccessorMixin.callGetGatherableItems(((VillagerEntity)(Object)this),((VillagerEntity)(Object)this));
+        for (int i = this.getInventory().size(); i >= 0; i-- ) {
+            ItemStack stack = this.getInventory().getStack(i);
+            if (stack.isEmpty()) continue;
+            if (GATHERABLE_ITEMS.contains(stack.getItem())) continue;
+            this.getInventory().removeStack(i);
+        }
     }
 
     @Inject(at = @At("HEAD"), method = "initBrain(Lnet/minecraft/entity/ai/brain/Brain;)V")
     private void changeVillagerProfession(Brain<VillagerEntity> brain, CallbackInfo ci) {
-        if (!(this.getWorld() instanceof ServerWorld)) {
+        if (!(this.getEntityWorld() instanceof ServerWorld)) {
             return;
         }
-        ServerWorld world = (ServerWorld) this.getWorld();
+        ServerWorld world = (ServerWorld) this.getEntityWorld();
 
-        VillagerProfession profession = this.getVillagerData().getProfession();
+        RegistryEntry<VillagerProfession> profession = this.getVillagerData().profession();
         if (CONFIG.villagersGeneralConfig.noNitwitVillagers && profession == VillagerProfession.NITWIT) {
-            this.setVillagerData(getVillagerData().withProfession(VillagerProfession.NONE));
+            this.setVillagerData(getVillagerData().withProfession((RegistryEntry<VillagerProfession>) VillagerProfession.NONE));
             brain.stopAllTasks(world, (VillagerEntity) ((Object) this));
         }
         if (CONFIG.villagersGeneralConfig.allNitwitVillagers && profession != VillagerProfession.NITWIT) {
-            this.setVillagerData(getVillagerData().withProfession(VillagerProfession.NITWIT));
+            this.setVillagerData(getVillagerData().withProfession((RegistryEntry<VillagerProfession>) VillagerProfession.NITWIT));
             this.releaseTicketFor(brain, world, MemoryModuleType.JOB_SITE);
             this.releaseTicketFor(brain, world, MemoryModuleType.POTENTIAL_JOB_SITE);
             brain.stopAllTasks(world, (VillagerEntity) ((Object) this));
@@ -145,7 +145,7 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
             BiPredicate<VillagerEntity, RegistryEntry<PointOfInterestType>> biPredicate = POINTS_OF_INTEREST.get(memoryModuleType);
             if (optional.isPresent() && biPredicate.test((VillagerEntity) ((Object) this), optional.get())) {
                 pointOfInterestStorage.releaseTicket(pos.pos());
-                DebugInfoSender.sendPointOfInterest(serverWorld, pos.pos());
+                //DebugInfoSender.sendPointOfInterest(serverWorld, pos.pos());
             }
         });
     }
@@ -200,7 +200,7 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
             cir.cancel();
         }
         if (CONFIG.golemsConfig.golemSpawnLimit) {
-            List<IronGolemEntity> golems = this.getWorld().getNonSpectatingEntities(IronGolemEntity.class,
+            List<IronGolemEntity> golems = this.getEntityWorld().getNonSpectatingEntities(IronGolemEntity.class,
                     this.getBoundingBox().expand(CONFIG.golemsConfig.golemSpawnLimitRange));
             if (golems.size() >= CONFIG.golemsConfig.golemSpawnLimitCount) {
                 cir.setReturnValue(false);
@@ -209,22 +209,6 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
         }
     }
 
-    @Inject(method = "readCustomDataFromNbt",
-            at = @At("TAIL"))
-   public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        // If initialized with a rod, get rid of it.
-        if (this.getMainHandStack().isOf(Items.FISHING_ROD)) {
-            this.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-        }
-        // Get rid of items the villager can't gather.
-        for (int i = this.getInventory().size(); i >= 0; i-- ) {
-            ItemStack stack = this.getInventory().getStack(i);
-            if (stack.isEmpty()) continue;
-            if (GATHERABLE_ITEMS.contains(stack.getItem())) continue;
-            if (this.getVillagerData().getProfession().gatherableItems().contains(stack.getItem())) continue;
-            this.getInventory().removeStack(i);
-        }
-    }
 
     @Inject(method = "setAttacker",
             at = @At("TAIL"))

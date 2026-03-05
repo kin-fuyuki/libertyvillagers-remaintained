@@ -4,10 +4,13 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.FishingBobberEntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.entity.state.FishingBobberEntityState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.VillagerEntity;
@@ -72,13 +75,13 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
                 .normal(matrix, 0.0f, 1.0f, 0.0f);
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
-                       VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
+    /*@Inject(method = "render*", at = @At("HEAD"), cancellable = true)
+    public void render(FishingBobberEntityState fishingBobberEntityState, MatrixStack matrixStack, OrderedRenderCommandQueue orderedRenderCommandQueue, CameraRenderState cameraRenderState) {
         double s;
         double q;
         double p;
         double o;
+        FishingBobberEntity fishingBobberEntity=fishingBobberEntityState.
         if (fishingBobberEntity.getOwner() == null) {
             return;
         }
@@ -89,7 +92,7 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         matrixStack.push();
         matrixStack.push();
         matrixStack.scale(0.5f, 0.5f, 0.5f);
-        matrixStack.multiply(this.dispatcher.getRotation());
+        matrixStack.multiply(this.dispatcher.camera.getRotation());
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
         MatrixStack.Entry entry = matrixStack.peek();
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(LAYER);
@@ -98,18 +101,18 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         vertex(vertexConsumer, entry, i, 1.0f, 1, 1, 0);
         vertex(vertexConsumer, entry, i, 0.0f, 1, 0, 0);
         matrixStack.pop();
-        float l = MathHelper.lerp(g, villager.prevBodyYaw, villager.bodyYaw) * ((float) Math.PI / 180);
+        float l = MathHelper.lerp(g, villager.lastYaw, villager.bodyYaw) * ((float) Math.PI / 180);
         double d = MathHelper.sin(l);
         double e = MathHelper.cos(l);
         double n = 0.4;
-        o = MathHelper.lerp(g, villager.prevX, villager.getX()) - d * n;
-        p = villager.prevY + (double) villager.getStandingEyeHeight() +
-                (villager.getY() - villager.prevY) * (double) g - 0.45;
-        q = MathHelper.lerp(g, villager.prevZ, villager.getZ()) + e * n;
+        o = MathHelper.lerp(g, villager.lastX, villager.getX()) - d * n;
+        p = villager.lastY + (double) villager.getStandingEyeHeight() +
+                (villager.getY() - villager.lastY) * (double) g - 0.45;
+        q = MathHelper.lerp(g, villager.lastZ, villager.getZ()) + e * n;
 
-        s = MathHelper.lerp(g, fishingBobberEntity.prevX, fishingBobberEntity.getX());
-        double t = MathHelper.lerp(g, fishingBobberEntity.prevY, fishingBobberEntity.getY()) + 0.25;
-        double u = MathHelper.lerp(g, fishingBobberEntity.prevZ, fishingBobberEntity.getZ());
+        s = MathHelper.lerp(g, fishingBobberEntity.lastX, fishingBobberEntity.getX());
+        double t = MathHelper.lerp(g, fishingBobberEntity.lastY, fishingBobberEntity.getY()) + 0.25;
+        double u = MathHelper.lerp(g, fishingBobberEntity.lastZ, fishingBobberEntity.getZ());
         float v = (float) (o - s);
         float w = (float) (p - t);
         float x = (float) (q - u);
@@ -123,9 +126,8 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
                     FishingBobberEntityRendererMixin.percentage(z + 1, 16));
         }
         matrixStack.pop();
-
 //fishingBobberEntity, f, g,
-        super.render(getAndUpdateRenderState(fishingBobberEntity,g), matrixStack, vertexConsumerProvider, i);
+        super.render(getAndUpdateRenderState(fishingBobberEntity,g), matrixStack, orderedRenderCommandQueue,cameraRenderState);
         ci.cancel();
-    }
+    }*/
 }

@@ -60,7 +60,7 @@ public abstract class FarmerVillagerTaskMixin {
         if (!serverWorld.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
             cir.setReturnValue(false);
             cir.cancel();
-        } else if (villagerEntity.getVillagerData().getProfession() != VillagerProfession.FARMER) {
+        } else if (villagerEntity.getVillagerData().profession() != VillagerProfession.FARMER) {
             cir.setReturnValue(false);
             cir.cancel();
         } else {
@@ -117,7 +117,7 @@ public abstract class FarmerVillagerTaskMixin {
         BlockState blockState = serverWorld.getBlockState(currentTarget);
         Block block = blockState.getBlock();
         Block block2 = serverWorld.getBlockState(currentTarget.down()).getBlock();
-        if (currentTarget.isWithinDistance(villagerEntity.getPos(), distance)) {
+        if (currentTarget.isWithinDistance(villagerEntity.getEntityPos(), distance)) {
             boolean foundBlockCrop = false;
             if (CONFIG.villagersProfessionConfig.preferPlantSameCrop) {
                 if (block instanceof CropBlock && ((CropBlock) block).isMature(blockState)) {
