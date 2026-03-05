@@ -45,7 +45,6 @@
     "WalkToNearestVisibleWantedItemTaskMixin",
     "WalkTowardJobSiteTaskMixin",
     "WanderAroundFarGoalMixin",
-    "WanderAroundTaskMixin",
     "WanderNearTargetGoalMixin"
   ],
   "client": [

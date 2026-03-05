@@ -5,7 +5,7 @@ import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.ai.brain.BlockPosLookTarget;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
-import net.minecraft.entity.ai.brain.task.WanderAroundTask;
+//import net.minecraft.entity.ai.brain.task.
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.mob.MobEntity;
@@ -24,7 +24,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 
-@Mixin(WanderAroundTask.class)
 public abstract class WanderAroundTaskMixin {
 
     static private final int MAX_RUN_TIME = 20 * 60; // One minute.
@@ -45,7 +44,7 @@ public abstract class WanderAroundTaskMixin {
 
     @Shadow
     abstract boolean hasReached(MobEntity entity, WalkTarget walkTarget);
-
+/*
     @ModifyArg(
             method = "<init>(II)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ai/brain/task/MultiTickTask;<init>(Ljava/util/Map;II)V"), index = 1)
@@ -161,5 +160,5 @@ public abstract class WanderAroundTaskMixin {
             return Math.max(1, distance);
         }
         return distance;
-    }
+    }*/
 }
