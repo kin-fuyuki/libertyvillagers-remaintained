@@ -34,7 +34,7 @@
     "PointOfInterestTypesMixin",
     "SecondaryPointsOfInterestSensorMixin",
     "SleepTaskMixin",
-    "TakeJobSiteTaskMixin",
+    "TargetUtilMixin",
     "VillagerBreedTaskMixin",
     "VillagerEntityMixin",
     "VillagerProfessionMixin",

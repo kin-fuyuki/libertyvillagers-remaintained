@@ -26,11 +26,4 @@ public class WalkTowardJobSiteTaskMixin {
         }
     }
 
-    @ModifyArg(method = "keepRunning(Lnet/minecraft/server/world/ServerWorld;" +
-            "Lnet/minecraft/entity/passive/VillagerEntity;J)V", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/ai/brain/task/TargetUtil;walkTowards" +
-                    "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/util/math/BlockPos;FI)V"), index = 3)
-    private int replaceCompletionRangeInClaimSite(int completionRange) {
-        return Math.max(completionRange, CONFIG.villagerPathfindingConfig.minimumPOISearchDistance);
-    }
 }

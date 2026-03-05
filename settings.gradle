@@ -8,3 +8,4 @@ pluginManagement	{
     }
 }
 rootProject.name	=	'libertyvillagers-remaintained'
+rootProject.buildFileName=rootProject.name+'-'+'1.21.10'+'0'
