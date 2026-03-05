@@ -31,7 +31,6 @@
     "MeleeAttackGoalMixin",
     "MemoryQueryResultAccessorMixin",
     "MobEntityMixin",
-    "ModelPredicateProviderRegistryMixin",
     "PointOfInterestTypesMixin",
     "SecondaryPointsOfInterestSensorMixin",
     "SleepTaskMixin",
