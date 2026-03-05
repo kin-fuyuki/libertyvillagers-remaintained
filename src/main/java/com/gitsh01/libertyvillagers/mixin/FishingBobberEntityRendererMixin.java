@@ -7,6 +7,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.FishingBobberEntityRenderer;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.VillagerEntity;
@@ -22,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FishingBobberEntityRenderer.class)
-public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<FishingBobberEntity> {
+public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<FishingBobberEntity, EntityRenderState> {
 
     @Final
     @Shadow
@@ -122,7 +123,9 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
                     FishingBobberEntityRendererMixin.percentage(z + 1, 16));
         }
         matrixStack.pop();
-        super.render(fishingBobberEntity, f, g, matrixStack, vertexConsumerProvider, i);
+
+//fishingBobberEntity, f, g,
+        super.render(getAndUpdateRenderState(fishingBobberEntity,g), matrixStack, vertexConsumerProvider, i);
         ci.cancel();
     }
 }

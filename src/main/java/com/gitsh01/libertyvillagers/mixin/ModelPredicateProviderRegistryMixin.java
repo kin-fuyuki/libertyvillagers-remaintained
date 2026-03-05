@@ -1,9 +1,10 @@
 package com.gitsh01.libertyvillagers.mixin;
 
 import com.google.common.collect.Maps;
+import net.minecraft.client.data.ModelProvider;/*
 import net.minecraft.client.item.ClampedModelPredicateProvider;
 import net.minecraft.client.item.ModelPredicateProvider;
-import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;*/
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -17,9 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
 
-@Mixin(ModelPredicateProviderRegistry.class)
+//@Mixin(ModelPredicateProviderRegistry.class)
 public class ModelPredicateProviderRegistryMixin {
-
+/*
     @Shadow
     @Mutable
     static Map<Item, Map<Identifier, ModelPredicateProvider>> ITEM_SPECIFIC;
@@ -35,11 +36,12 @@ public class ModelPredicateProviderRegistryMixin {
         // Villagers should show the used graphic for the fishing rod.
         ClampedModelPredicateProvider newProvider = (stack, world, entity, seed) -> {
             if (entity != null && entity.getType() == EntityType.VILLAGER) {
+
                 return 1.0f;
             }
             return provider.unclampedCall(stack, world, entity, seed);
         };
         ITEM_SPECIFIC.computeIfAbsent(item, key -> Maps.newHashMap()).put(id, newProvider);
         ci.cancel();
-    }
+    }*/
 }

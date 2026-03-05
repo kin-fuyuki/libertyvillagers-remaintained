@@ -24,11 +24,11 @@ public class FisherWorkTask extends VillagerWorkTask {
         GlobalPos globalPos = optional.get();
         BlockState blockState = world.getBlockState(globalPos.pos());
         if (blockState.isOf(Blocks.BARREL)) {
-            this.cookAndDropFish(entity);
+            this.cookAndDropFish(world,entity);
         }
     }
 
-    private void cookAndDropFish(VillagerEntity entity) {
+    private void cookAndDropFish(ServerWorld world,VillagerEntity entity) {
         SimpleInventory simpleInventory = entity.getInventory();
         int cod = simpleInventory.count(Items.COD);
         int salmon = simpleInventory.count(Items.SALMON);
@@ -36,11 +36,11 @@ public class FisherWorkTask extends VillagerWorkTask {
         simpleInventory.removeItem(Items.SALMON, salmon);
         ItemStack cookedSalmon = simpleInventory.addStack(new ItemStack(Items.COOKED_SALMON, salmon));
         if (!cookedSalmon.isEmpty()) {
-            entity.dropStack(cookedSalmon, 0.5f);
+            entity.dropStack(world,cookedSalmon, 0.5f);
         }
         ItemStack cookedCod = simpleInventory.addStack(new ItemStack(Items.COOKED_COD, cod));
         if (!cookedCod.isEmpty()) {
-            entity.dropStack(cookedCod, 0.5f);
+            entity.dropStack(world,cookedCod, 0.5f);
         }
     }
 }

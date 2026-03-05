@@ -2,7 +2,7 @@ package com.gitsh01.libertyvillagers.mixin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.MemoryQueryResult;
-import net.minecraft.entity.ai.brain.task.GoToNearbyPositionTask;
+import net.minecraft.entity.ai.brain.task.GoToPosTask;
 import net.minecraft.entity.ai.brain.task.TaskTriggerer;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.VillagerEntity;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(GoToNearbyPositionTask.class)
+@Mixin(GoToPosTask.class)
 public class GoToNearbyPositionTaskMixin {
 
     @Inject(method = "method_47156",
